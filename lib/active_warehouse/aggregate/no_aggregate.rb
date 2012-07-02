@@ -106,7 +106,7 @@ module ActiveWarehouse #:nodoc:
             end
           end
           agg_sql
-        }.join(",\n")
+        }
         
         current_column_name = [current_column_name] unless current_column_name.is_a? Array
         current_row_name    = [current_row_name]    unless current_row_name.is_a? Array
@@ -121,8 +121,7 @@ module ActiveWarehouse #:nodoc:
         
         sql = ''
         sql += "SELECT\n"
-        sql += "  #{(column_dimension_columns + row_dimension_columns).join(", \n  ")},\n"
-        sql += fact_columns
+        sql += "  #{(column_dimension_columns + row_dimension_columns + fact_columns).join(", \n  ")}"
         sql += "\nFROM\n"
 
         sql += "  #{fact_class.table_name}"
@@ -201,8 +200,10 @@ module ActiveWarehouse #:nodoc:
           "#{row_dimension_name}.#{group_by_row}"
         end
         
-        sql += "\nGROUP BY\n"
-        sql += "  #{(group_by_columns + group_by_rows).join(", \n  ")}"
+        unless group_by_columns.empty? and group_by_rows.empty?
+          sql += "\nGROUP BY\n"
+          sql += "  #{(group_by_columns + group_by_rows).join(", \n  ")}"
+        end
         
         if options[:order]
           order_by = options[:order]
@@ -218,7 +219,6 @@ module ActiveWarehouse #:nodoc:
           result = ActiveWarehouse::CubeQueryResult.new(
             cube_class.aggregate_fields(used_dimensions)
           )
-          
           
            column_dimension_columns =  current_column_name.map do |column_name|
               "#{column_dimension_name}_1_#{column_name}"

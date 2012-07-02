@@ -211,6 +211,7 @@ module ActiveWarehouse #:nodoc
         conditions_parts = []
         conditions_values = []
         
+        
         process_dimension_filter(conditions_parts, conditions_values)
         
         conditions = [conditions_parts.join(' AND ')] + conditions_values unless conditions_parts.empty?
